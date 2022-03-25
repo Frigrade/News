@@ -16,7 +16,10 @@ open class BaseFragment(resId: Int) : Fragment(resId) {
         viewModel = (activity as NewsActivity).viewModel
 
         paginationScrollListener = PaginationScrollListener(viewModel::getBreakingNews)
+        otherSetups()
     }
+
+    open fun otherSetups() {}
 
     fun hideProgressBar(paginationProgressBar: ProgressBar) {
         paginationProgressBar.visibility = View.INVISIBLE

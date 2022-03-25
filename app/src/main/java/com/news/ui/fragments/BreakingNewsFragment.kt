@@ -1,7 +1,6 @@
 package com.news.ui.fragments
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.news.R
@@ -9,7 +8,6 @@ import com.news.domain.entity.Article
 import com.news.presentation.NewsAdapter
 import com.news.presentation.state.NewsState
 import com.news.ui.BaseFragment
-import com.news.ui.NewsActivity
 import com.news.util.Constants.Companion.QUERY_PAGE_SIZE
 import com.news.util.PaginationScrollListener
 import kotlinx.android.synthetic.main.fragment_breaking_news.*
@@ -19,11 +17,8 @@ class BreakingNewsFragment : BaseFragment(R.layout.fragment_breaking_news) {
 
     private lateinit var newsAdapter: NewsAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = (activity as NewsActivity).viewModel
+    override fun otherSetups() {
         setupRecyclerView()
-
         viewModel.breakingNewsLiveData.observe(viewLifecycleOwner) { state ->
             renderContent(state)
         }

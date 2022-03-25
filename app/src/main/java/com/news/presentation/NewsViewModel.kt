@@ -9,9 +9,10 @@ import com.news.domain.entity.NewsResponse
 import com.news.presentation.state.NewsState
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
 
-class NewsViewModel(
+class NewsViewModel @Inject constructor(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
     val breakingNewsLiveData: MutableLiveData<NewsState> = MutableLiveData()

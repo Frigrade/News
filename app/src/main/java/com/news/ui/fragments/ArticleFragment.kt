@@ -5,8 +5,8 @@ import android.view.View
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
-import com.news.R
 import com.google.android.material.snackbar.Snackbar
+import com.news.R
 import com.news.presentation.NewsViewModel
 import com.news.ui.NewsActivity
 import kotlinx.android.synthetic.main.fragment_article.*
