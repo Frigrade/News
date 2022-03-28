@@ -1,6 +1,5 @@
 package com.news.ui
 
-import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
@@ -10,16 +9,6 @@ import com.news.util.PaginationScrollListener
 open class BaseFragment(resId: Int) : Fragment(resId) {
     lateinit var viewModel: NewsViewModel
     lateinit var paginationScrollListener: PaginationScrollListener
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = (activity as NewsActivity).viewModel
-
-        paginationScrollListener = PaginationScrollListener(viewModel::getBreakingNews)
-        otherSetups()
-    }
-
-    open fun otherSetups() {}
 
     fun hideProgressBar(paginationProgressBar: ProgressBar) {
         paginationProgressBar.visibility = View.INVISIBLE

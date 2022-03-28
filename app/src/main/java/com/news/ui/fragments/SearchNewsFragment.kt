@@ -15,7 +15,6 @@ import com.news.util.Constants
 import com.news.util.Constants.Companion.SEARCH_NEWS_TIME_DELAY
 import com.news.util.PaginationScrollListener
 import kotlinx.android.synthetic.main.fragment_search_news.*
-import kotlinx.android.synthetic.main.fragment_search_news.paginationProgressBar
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -29,10 +28,11 @@ class SearchNewsFragment : BaseFragment(R.layout.fragment_search_news) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = (activity as NewsActivity).viewModel
+        paginationScrollListener = PaginationScrollListener(viewModel::searchNews)
+        setupRecyclerView()
         viewModel.searchNewsLiveData.observe(viewLifecycleOwner) { state ->
             renderContent(state)
         }
-        setupRecyclerView()
 
         var job: Job? = null
         etSearch.addTextChangedListener { editable ->
@@ -42,6 +42,7 @@ class SearchNewsFragment : BaseFragment(R.layout.fragment_search_news) {
                 delay(SEARCH_NEWS_TIME_DELAY)
                 editable?.let {
                     if (editable.toString().isNotEmpty()) {
+                        viewModel.clearResults()
                         viewModel.searchNews(editable.toString())
                     }
                 }
@@ -71,7 +72,7 @@ class SearchNewsFragment : BaseFragment(R.layout.fragment_search_news) {
 
     private fun updatePaginationListener(state: NewsState.Content) {
         val totalPages = state.data.totalResults / Constants.QUERY_PAGE_SIZE + 2
-        paginationScrollListener.isLastPage = viewModel.breakingNewsPage == totalPages
+        paginationScrollListener.isLastPage = viewModel.searchNewsPage == totalPages
         if (paginationScrollListener.isLastPage) {
             rvSearchNews.setPadding(0, 0, 0, 0)
         }
@@ -91,6 +92,6 @@ class SearchNewsFragment : BaseFragment(R.layout.fragment_search_news) {
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(::openArticle)
         rvSearchNews.adapter = newsAdapter
-        rvSearchNews.addOnScrollListener(PaginationScrollListener(viewModel::getBreakingNews))
+        rvSearchNews.addOnScrollListener(paginationScrollListener)
     }
 }

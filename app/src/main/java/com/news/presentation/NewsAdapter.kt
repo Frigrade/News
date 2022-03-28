@@ -6,20 +6,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.news.R
 import com.bumptech.glide.Glide
+import com.news.R
 import com.news.domain.entity.Article
 import kotlinx.android.synthetic.main.item_article_preview.view.*
 
 class NewsAdapter(
-    private val openArticle: (Article) -> Unit) : ListAdapter<Article, NewsAdapter.ArticleViewHolder>(DiffUtilCallback()) {
+    private val openArticle: (Article) -> Unit
+) : ListAdapter<Article, NewsAdapter.ArticleViewHolder>(DiffUtilCallback()) {
 
-    inner class ArticleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
+    inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
         return ArticleViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                 R.layout.item_article_preview,
+                R.layout.item_article_preview,
                 parent,
                 false
             )

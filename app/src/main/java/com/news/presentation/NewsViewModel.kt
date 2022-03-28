@@ -7,6 +7,8 @@ import com.news.data.repository.NewsRepository
 import com.news.domain.entity.Article
 import com.news.domain.entity.NewsResponse
 import com.news.presentation.state.NewsState
+import com.news.util.Constants.Companion.API_TOTAL_PAGES
+import com.news.util.Constants.Companion.HTTP_TOO_MANY_REQUESTS
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -23,20 +25,23 @@ class NewsViewModel @Inject constructor(
     var searchNewsPage = 1
     var searchNewsResponse: NewsResponse? = null
 
-    init {
-        getBreakingNews("us")
-    }
-
     fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+        val currentArticleList = (breakingNewsLiveData.value as? NewsState.Content)?.data?.articles
         breakingNewsLiveData.postValue(NewsState.Loading)
         val rawResponse = newsRepository.getBreakingNews(countryCode, breakingNewsPage)
-        breakingNewsLiveData.postValue(handleBreakingNewsResponse(rawResponse))
+        breakingNewsLiveData.postValue(handleBreakingNewsResponse(rawResponse, currentArticleList))
     }
 
-    private fun handleBreakingNewsResponse(response: Response<NewsResponse>): NewsState {
+    private fun handleBreakingNewsResponse(
+        response: Response<NewsResponse>,
+        currentArticleList: MutableList<Article>?
+    ): NewsState {
         if (response.isSuccessful) {
             response.body()?.let {
                 breakingNewsPage++
+                if (breakingNewsPage > API_TOTAL_PAGES) {
+                    breakingNewsPage = API_TOTAL_PAGES
+                }
                 if (breakingNewsResponse == null) {
                     breakingNewsResponse = it
                 } else {
@@ -47,6 +52,15 @@ class NewsViewModel @Inject constructor(
                 return NewsState.Content(breakingNewsResponse ?: it)
             }
         }
+        if (response.code() == HTTP_TOO_MANY_REQUESTS) {
+            return NewsState.Content(
+                NewsResponse(
+                    articles = currentArticleList ?: mutableListOf(),
+                    status = "",
+                    totalResults = currentArticleList?.size ?: 0
+                )
+            )
+        }
         return NewsState.Error(response.message())
     }
 
@@ -54,6 +68,11 @@ class NewsViewModel @Inject constructor(
         searchNewsLiveData.postValue(NewsState.Loading)
         val rawResponse = newsRepository.searchNews(searchQuery, searchNewsPage)
         searchNewsLiveData.postValue(handleSearchNewsResponse(rawResponse))
+    }
+
+    fun clearResults() {
+        searchNewsResponse = null
+        searchNewsPage = 1
     }
 
     private fun handleSearchNewsResponse(response: Response<NewsResponse>): NewsState {
